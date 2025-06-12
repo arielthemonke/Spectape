@@ -1,4 +1,6 @@
 ﻿using BepInEx;
+using ExitGames.Client.Photon;
+using Photon.Pun;
 using UnityEngine;
 using static Spectape.Info;
 
@@ -21,7 +23,10 @@ namespace Spectape
         {
             NetworkSystem.Instance.OnMultiplayerStarted += JoinedRoom;
             NetworkSystem.Instance.OnReturnedToSinglePlayer += OnLeaveRoom;
-            fov = Camera.main.fieldOfView; // idk if this works or does anything but ok
+            fov = Camera.main != null ? Camera.main.fieldOfView : 60f;
+            Hashtable hash = new Hashtable();
+            hash.Add("SpectapeVersion", Version);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
         }
 
         void FixedUpdate()
@@ -39,6 +44,7 @@ namespace Spectape
                         if (!parentSet)
                         {
                             spectape?.transform.SetParent(rig.headMesh.transform, false);
+                            spectape.transform.localPosition = new Vector3(0f, 0.2f, 0f);
                             parentSet = true;
                         }
                     }
@@ -47,6 +53,7 @@ namespace Spectape
                         if (parentSet)
                         {
                             spectape?.transform.SetParent(GorillaTagger.Instance.headCollider.transform, false);
+                            spectape.transform.localPosition = Vector3.zero;
                             parentSet = false;
                         }
                     }
@@ -58,6 +65,7 @@ namespace Spectape
                         if (parentSet)
                         {
                             spectape?.transform.SetParent(GorillaTagger.Instance.headCollider.transform, false);
+                            spectape.transform.localPosition = Vector3.zero;
                             parentSet = false;
                         }
                     }
@@ -91,6 +99,7 @@ namespace Spectape
             cam.fieldOfView = fov;
             cam.farClipPlane = 5000f;
             cam.nearClipPlane = 0.01f;
+            cam.tag = "MainCamera";
             return cameraObj;
         }
     }
